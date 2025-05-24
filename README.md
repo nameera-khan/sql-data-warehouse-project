@@ -1,7 +1,7 @@
 # sql-data-warehouse-project
 A modern data warehouse with SQL server which includes ETL processes, data modelling and analytics
 
-This is a repository for the ** Data Warehouse and Analytics Project ** !
+This is a repository for the **Data Warehouse and Analytics Project** !
 This project's objective is to demonstrate data warehousing and analytical solutions; includes building a data warehouse to generating actionable insights. This is a portfolio project for data engineering endeavours and analysis of the data stored in the warehouse. 
 
 The requirements for the project are as listed below: 
