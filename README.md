@@ -10,11 +10,11 @@ The requirements for the project are as listed below:
 To develop a data warehouse using SQL server to combine sales data, consequently enabling analytical ad-hoc reporting and informed decision making. 
 
 ### Specification 
-**Data Sources** : Import the data from the source system that are available as CSV files 
-**Data Quality** : Cleanse and transform the data suitable for business analysis
-**Integration** : Combine the 2 source files into a single, user-friendly data model designed for analytical queries. 
-**Scope** : Focus on the latest dataset only and not include historisation in the warehouse.
-**Documentation** : Provide clear documentation of the data model to support business stakeholders and technical teams. 
+- **Data Sources** : Import the data from the source system that are available as CSV files 
+- **Data Quality** : Cleanse and transform the data suitable for business analysis
+- **Integration** : Combine the 2 source files into a single, user-friendly data model designed for analytical queries. 
+- **Scope** : Focus on the latest dataset only and not include historisation in the warehouse.
+- **Documentation** : Provide clear documentation of the data model to support business stakeholders and technical teams. 
 
 
 ---
