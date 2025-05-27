@@ -1,0 +1,13 @@
+BULK INSERT bronze.crm_cust_info
+FROM '/Users/nameerakhan/Documents/sql-data-warehouse-project/datasets/source_crm/cust_info.csv'
+WITH (
+    FIRSTROW = 2,
+    FIELDTERMINATOR = ',',
+    TABLOCK 
+); 
+
+SELECT * FROM bronze.crm_cust_info
+
+
+//to rename table with schema specification 
+EXEC sp_rename 'bronze.cust_info', 'crm_cust_info';
