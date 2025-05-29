@@ -1,0 +1,85 @@
+-- Analyse data in Silver Layer 
+
+-- Exploring data in the bronze layer -- 
+SELECT TOP (1000) * FROM bronze.erp_cust_az12;
+SELECT TOP (1000) * FROM bronze.crm_cust_info;
+SELECT TOP 1000 * FROM bronze.erp_loc_a101;
+
+SELECT TOP (1000) * FROM bronze.crm_prod_info;
+SELECT TOP 1000 * FROM bronze.erp_px_cat_g1v2;
+
+-- Copy the same dataset from bronze schema into silver schema for analysis -- 
+-- Generate and execute dynamic SQL for all tables
+DECLARE @sql NVARCHAR(MAX) = '';
+
+SELECT @sql = @sql + 
+    'IF OBJECT_ID(''silver.' + TABLE_NAME + ''', ''U'') IS NOT NULL DROP TABLE silver.' + TABLE_NAME + ';' + CHAR(10) +
+    'SELECT * INTO silver.' + TABLE_NAME + ' FROM bronze.' + TABLE_NAME + ';' + CHAR(10) +
+    'PRINT ''Copied: ' + TABLE_NAME + ''';' + CHAR(10)
+FROM INFORMATION_SCHEMA.TABLES 
+WHERE TABLE_SCHEMA = 'bronze' 
+  AND TABLE_TYPE = 'BASE TABLE';
+
+PRINT @sql; -- Review the generated SQL first
+EXEC sp_executesql @sql; -- Execute the copy commands
+
+-- Check if the tables have been copied correctly -- 
+DECLARE @sql NVARCHAR(MAX) = '';
+
+-- Build dynamic SQL for each table
+SELECT @sql = @sql + 
+    'SELECT 
+        ''' + t.TABLE_NAME + ''' AS TABLE_NAME,
+        (SELECT COUNT(*) FROM bronze.' + QUOTENAME(t.TABLE_NAME) + ') AS bronze_count,
+        (SELECT COUNT(*) FROM silver.' + QUOTENAME(t.TABLE_NAME) + ') AS silver_count,
+        CASE 
+            WHEN (SELECT COUNT(*) FROM bronze.' + QUOTENAME(t.TABLE_NAME) + ') = 
+                 (SELECT COUNT(*) FROM silver.' + QUOTENAME(t.TABLE_NAME) + ')
+            THEN ''Match!'' 
+            ELSE ''MISMATCH'' 
+        END AS status
+    UNION ALL '
+FROM INFORMATION_SCHEMA.TABLES t
+WHERE t.TABLE_SCHEMA = 'bronze' 
+  AND t.TABLE_TYPE = 'BASE TABLE';
+
+-- Remove the last UNION ALL and execute
+IF LEN(@sql) > 0
+BEGIN
+    SET @sql = LEFT(@sql, LEN(@sql) - 10);
+    EXEC sp_executesql @sql;
+END
+ELSE
+BEGIN
+    PRINT 'No tables found in bronze schema';
+END
+
+
+-- Adding columns with default dates to the tables in the silver schema for the data engineer's reference --
+DECLARE @sql NVARCHAR(MAX) = '';
+DECLARE @columnName NVARCHAR(128) = 'dwh_create_date';
+DECLARE @defaultValue NVARCHAR(128) = 'CONVERT(DATETIME2, GETDATE())';
+
+SELECT @sql = @sql + 
+    'IF NOT EXISTS (SELECT 1 FROM sys.columns 
+                   WHERE object_id = OBJECT_ID(''silver.' + t.TABLE_NAME + ''') 
+                   AND name = ''' + @columnName + ''')
+     BEGIN
+         ALTER TABLE silver.' + QUOTENAME(t.TABLE_NAME) + '
+         ADD ' + QUOTENAME(@columnName) + ' DATETIME2 NOT NULL
+         CONSTRAINT DF_' + t.TABLE_NAME + '_' + @columnName + ' 
+         DEFAULT ' + @defaultValue + ';
+         PRINT ''Added column to silver.' + t.TABLE_NAME + ''';
+     END
+     ELSE
+     BEGIN
+         PRINT ''Column already exists in silver.' + t.TABLE_NAME + ''';
+     END
+     ' + CHAR(10)
+FROM INFORMATION_SCHEMA.TABLES t
+WHERE t.TABLE_SCHEMA = 'silver'
+  AND t.TABLE_TYPE = 'BASE TABLE';
+
+-- Execute the generated SQL
+PRINT @sql; -- Review first
+EXEC sp_executesql @sql;
