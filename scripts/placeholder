@@ -1,3 +1,5 @@
 Adding datasets (csv or flat files) in SQL server on macOS requires extentions. The script used can be utilised to create tables, however, that does not work the same way to upload the csv files into the tables. 
 
 This requires downloading docker and connecting the server to the docker container. 
+
+Stored procedure in this setting can only be done after the CSV file has been imported into the SQL server. 
