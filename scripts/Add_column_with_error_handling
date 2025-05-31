@@ -1,0 +1,34 @@
+BEGIN TRY
+    BEGIN TRANSACTION;
+    IF NOT EXISTS (
+        SELECT 1 FROM sys.columns
+        WHERE object_id = OBJECT_ID('silver.crm_cust_info')
+        AND name = 'dwh_create_date'
+    )
+
+    BEGIN 
+        ALTER TABLE silver.crm_cust_info
+        ADD dwh_create_date DATETIME2 NOT NULL
+        CONSTRAINT DF_crm_cust_info_dwh_create_date DEFAULT GETDATE();
+
+        PRINT 'column dwh_create_date added successfully';
+
+    END 
+    ELSE 
+    BEGIN
+        PRINT 'column dwh_create_date already exists';
+    END
+
+    COMMIT TRANSACTION;
+
+END TRY 
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+    
+    PRINT 'Error adding column: ' + ERROR_MESSAGE();
+    THROW;
+END CATCH
+
+SELECT * FROM silver.crm_cust_info;
+
