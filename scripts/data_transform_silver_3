@@ -58,3 +58,71 @@ INSERT INTO silver.crm_cust_info (
 DROP TABLE silver.temp_transformed_cust;
 
 COMMIT TRANSACTION;
+
+
+-- Data Transformation within the product information table crm_prod_info
+
+BEGIN TRANSACTION;
+
+-- Step 1: Create transformed data in temp table
+SELECT 
+    prd_id,
+    REPLACE(SUBSTRING(prd_key, 1, 5), '-','_') AS cat_id, -- Derived column
+    SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
+    prd_nm,
+    ISNULL(prd_cost, 0) AS prd_cost, --Handling of missing information
+    CASE -- Data mapping 
+        WHEN UPPER(TRIM(prd_line)) = 'M' THEN 'Mountain'
+        WHEN UPPER(TRIM(prd_line)) = 'R' THEN 'Road'
+        WHEN UPPER(TRIM(prd_line)) = 'S' THEN 'Other Sales'
+        WHEN UPPER(TRIM(prd_line)) = 'T' THEN 'Touring'
+        ELSE 'n/a'
+    END AS prd_line,
+    prd_start_dt,
+    DATEADD(day, -1, LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)) AS prd_end_dt   -- Data enrichment 
+INTO silver.temp_transformed_prod
+FROM bronze.crm_prod_info;
+
+-- Step 2: Clear target table
+TRUNCATE TABLE silver.crm_prod_info;
+
+-- Step 3: Insert transformed data
+INSERT INTO silver.crm_prod_info(
+    prd_id,
+    cat_id,
+    prd_key,
+    prd_nm,
+    prd_cost,
+    prd_line,
+    prd_start_dt,
+    prd_end_dt
+)
+SELECT 
+    prd_id,
+    cat_id,
+    prd_key,
+    prd_nm,
+    prd_cost,
+    prd_line,
+    prd_start_dt,
+    prd_end_dt
+FROM silver.temp_transformed_prod
+WHERE prd_end_dt IS NOT NULL OR 
+      prd_id IN (
+          SELECT prd_id 
+          FROM silver.temp_transformed_prod t1
+          WHERE prd_end_dt IS NULL AND
+                NOT EXISTS (
+                    SELECT 1 
+                    FROM silver.temp_transformed_prod t2
+                    WHERE t2.prd_key = t1.prd_key AND
+                          t2.prd_start_dt > t1.prd_start_dt
+                )
+      );
+
+-- Step 4: Clean up
+DROP TABLE silver.temp_transformed_prod;
+
+COMMIT TRANSACTION;
+
+
