@@ -198,4 +198,38 @@ FROM silver.temp_transformed_sales;
 
 COMMIT TRANSACTION;
 
+-- Transform ERP tables 
+BEGIN TRANSACTION; 
+
+
+SELECT 
+CASE WHEN cid LIKE 'NAS%' THEN SUBSTRING(cid, 4, LEN(cid)) -- position 4 and dynamic length 
+    ELSE cid
+END AS cid,
+CASE WHEN bdate > GETDATE() THEN NULL
+    ELSE bdate
+END AS bdate,
+CASE WHEN UPPER(TRIM(gen)) IN ('F','FEMALE') THEN 'Female'
+     WHEN UPPER(TRIM(gen)) IN ('M', 'MALE') THEN 'Male'
+     ELSE 'n/a'
+END AS gen
+INTO silver.temp_erp_az12
+FROM bronze.erp_cust_az12;
+
+TRUNCATE TABLE silver.erp_cust_az12;
+
+INSERT INTO silver.erp_cust_az12 
+(
+    cid,
+    bdate,
+    gen
+)
+SELECT
+
+cid,
+bdate,
+gen
+FROM silver.temp_erp_az12
+COMMIT TRANSACTION;
+
 
