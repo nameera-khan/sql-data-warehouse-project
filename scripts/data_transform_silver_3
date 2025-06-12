@@ -1,22 +1,7 @@
--- To identify quality issues -- 
-SELECT 
-cst_id,
-COUNT(*)
-FROM bronze.crm_cust_info
-GROUP BY cst_id 
-HAVING COUNT(*) > 1 OR cst_id IS NULL
+--EXEC silver.load_silver
 
--- Checking one of the cst_id with duplicate values 
-SELECT * FROM bronze.crm_cust_info
-WHERE cst_id = 29466
-
-/ * Result 
-  29466	AW00029466	NULL	NULL	NULL	NULL	2026-01-25
-  29466	AW00029466	Lance	Jimenez	M	NULL	2026-01-26
-  29466	AW00029466	Lance	Jimenez	M	M	2026-01-27
-  * /
-
--- Insert in silver the below cleaned data
+CREATE OR ALTER PROCEDURE silver.load_silver AS 
+BEGIN
 BEGIN TRANSACTION; 
 
 SELECT 
@@ -42,9 +27,9 @@ FROM (
     WHERE cst_id IS NOT NULL
 )t WHERE flag_last = 1;
 
-
+PRINT '>>TRUNCATING TABLE silver.crm_cust_info'
 TRUNCATE TABLE silver.crm_cust_info;
-
+PRINT '>>INSERTING DATA INTO silver.crm_cust_info'
 INSERT INTO silver.crm_cust_info (
     cst_id,
     cst_key,
@@ -54,24 +39,30 @@ INSERT INTO silver.crm_cust_info (
     cst_gndr,
     cst_create_date
 )
-
+SELECT 
+    cst_id,
+    cst_key,
+    cst_firstname,
+    cst_lastname,
+    cst_marital_status,
+    cst_gndr,
+    cst_create_date
+FROM silver.temp_transformed_cust
 DROP TABLE silver.temp_transformed_cust;
 
 COMMIT TRANSACTION;
-
-
--- Data Transformation within the product information table crm_prod_info
+-- insert the above into silver table 
 
 BEGIN TRANSACTION;
 
 -- Step 1: Create transformed data in temp table
 SELECT 
     prd_id,
-    REPLACE(SUBSTRING(prd_key, 1, 5), '-','_') AS cat_id, -- Derived column
+    REPLACE(SUBSTRING(prd_key, 1, 5), '-','_') AS cat_id,
     SUBSTRING(prd_key, 7, LEN(prd_key)) AS prd_key,
     prd_nm,
-    ISNULL(prd_cost, 0) AS prd_cost, --Handling of missing information
-    CASE -- Data mapping 
+    ISNULL(prd_cost, 0) AS prd_cost,
+    CASE 
         WHEN UPPER(TRIM(prd_line)) = 'M' THEN 'Mountain'
         WHEN UPPER(TRIM(prd_line)) = 'R' THEN 'Road'
         WHEN UPPER(TRIM(prd_line)) = 'S' THEN 'Other Sales'
@@ -79,12 +70,14 @@ SELECT
         ELSE 'n/a'
     END AS prd_line,
     prd_start_dt,
-    DATEADD(day, -1, LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)) AS prd_end_dt   -- Data enrichment 
+    DATEADD(day, -1, LEAD(prd_start_dt) OVER (PARTITION BY prd_key ORDER BY prd_start_dt)) AS prd_end_dt
 INTO silver.temp_transformed_prod
 FROM bronze.crm_prod_info;
 
--- Step 2: Clear target table
+PRINT '>>TRUNCATING TABLE silver.crm_prod_info'
 TRUNCATE TABLE silver.crm_prod_info;
+PRINT '>>INSERTING DATA INTO silver.crm_prod_info'
+-- Step 2: Clear target table
 
 -- Step 3: Insert transformed data
 INSERT INTO silver.crm_prod_info(
@@ -140,8 +133,7 @@ CREATE TABLE [silver].[crm_sales_details] (
     [sls_price]       INT           NULL,
     [dwh_create_date] DATETIME2 (7) CONSTRAINT [DF_crm_sales_details_dwh_create_date] DEFAULT (CONVERT([datetime2],getdate())) NOT NULL
 );
--- Sales table transformation
--- STEP 1
+-- Sales table transformation 
 BEGIN TRANSACTION;
 
 -- Transform and clean data into temporary table
@@ -170,9 +162,12 @@ SELECT
 INTO silver.temp_transformed_sales
 FROM bronze.crm_sales_details;
 
+PRINT '>> TRUNCATING TABLE silver.crm_sales_details'
+TRUNCATE TABLE silver.crm_sales_details;
+PRINT '>>INSERTING INTO silver.crm_sales_details'
 
 
--- STEP 2: Insert transformed data into target table
+-- Insert transformed data into target table
 INSERT INTO silver.crm_sales_details (
     sls_ord_num,
     sls_prd_key,
@@ -216,8 +211,9 @@ END AS gen
 INTO silver.temp_erp_az12
 FROM bronze.erp_cust_az12;
 
+PRINT '>>TRUNCATING TABLE silver.erp_cust_az12'
 TRUNCATE TABLE silver.erp_cust_az12;
-
+PRINT '>>INSERTING INTO TABLE silver.erp_cust_az12'
 INSERT INTO silver.erp_cust_az12 
 (
     cid,
@@ -233,3 +229,61 @@ FROM silver.temp_erp_az12
 COMMIT TRANSACTION;
 
 
+
+--transforming location
+BEGIN TRANSACTION;
+
+SELECT 
+REPLACE(cid,'-','') cid,
+CASE WHEN TRIM(cntry) = 'DE' THEN 'Germany'
+     WHEN TRIM(cntry) IN ('US','USA') THEN 'United States'
+     WHEN TRIM(cntry) = '' or cntry IS NULL THEN 'n/a'
+     ELSE TRIM(cntry)
+END AS cntry
+INTO silver.temp_loc_a101
+FROM bronze.erp_loc_a101 
+
+PRINT '>> TRUNCATING TABLE silver.erp_loc_a101'
+TRUNCATE TABLE silver.erp_loc_a101
+PRINT '>>inserting TABLE silver.erp_loc_a101'
+
+INSERT INTO silver.erp_loc_a101
+(
+cid,
+cntry
+)
+SELECT 
+cid,
+cntry
+
+FROM silver.temp_loc_a101
+COMMIT TRANSACTION;
+
+DROP TABLE silver.temp_loc_a101;
+
+-- 
+
+BEGIN TRANSACTION;
+PRINT '>>TRUNCATING TABLE silver.erp_px_cat_g1v2'
+TRUNCATE TABLE silver.erp_px_cat_g1v2
+PRINT '>>INSERTING INTO TABLE silver.erp_px_cat_g1v2'
+
+INSERT INTO silver.erp_px_cat_g1v2
+(
+    id,
+    cat,
+    subcat,
+    maintenance
+)
+SELECT 
+
+    id,  
+    cat,
+    subcat,
+    maintenance
+
+FROM  bronze.erp_px_cat_g1v2
+
+COMMIT TRANSACTION;
+
+END
