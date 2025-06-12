@@ -1,3 +1,15 @@
+/* Quality Checks
+
+Script purpose: To perform various quality checks for data consistency, standardisation across
+silver schema. It includes checks for:
+- NULL or duplicates
+- Unwanted spaces
+- Standardisation 
+- Invalid dates
+- Data consistency between related fields
+*/
+
+
 -- To identify quality issues -- 
 SELECT 
 prd_id,
