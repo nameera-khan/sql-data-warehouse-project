@@ -9,7 +9,7 @@ SELECT TOP (1000) * FROM bronze.crm_prod_info;
 SELECT TOP 1000 * FROM bronze.erp_px_cat_g1v2;
 
 -- Copy the same dataset from bronze schema into silver schema for analysis -- 
--- Generate and execute dynamic SQL for all tables
+-- STEP 1: Generate and execute dynamic SQL for all tables
 DECLARE @sql NVARCHAR(MAX) = '';
 
 SELECT @sql = @sql + 
@@ -23,7 +23,7 @@ WHERE TABLE_SCHEMA = 'bronze'
 PRINT @sql; -- Review the generated SQL first
 EXEC sp_executesql @sql; -- Execute the copy commands
 
--- Check if the tables have been copied correctly -- 
+-- STEP 2: After executing the dynamic SQL for all tables check if the tables have been copied correctly -- 
 DECLARE @sql NVARCHAR(MAX) = '';
 
 -- Build dynamic SQL for each table
@@ -55,7 +55,7 @@ BEGIN
 END
 
 
--- Adding columns with default dates to the tables in the silver schema for the data engineer's reference --
+-- STEP 3: To add columns with default dates to the tables in the silver schema for the data engineer's reference --
 DECLARE @sql NVARCHAR(MAX) = '';
 DECLARE @columnName NVARCHAR(128) = 'dwh_create_date';
 DECLARE @defaultValue NVARCHAR(128) = 'CONVERT(DATETIME2, GETDATE())';
