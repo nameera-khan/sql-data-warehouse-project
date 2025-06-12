@@ -1,3 +1,9 @@
+/*
+Script Purpose: LOAD SILVER LAYER WITH TRANSFORMATIONS INTO THE DATABASE
+Notes: Run this file after loading the bronze layer.
+- In MacOS using azure data studio, you must download an extension and upload the dataset into the server manually. 
+*/
+
 --EXEC silver.load_silver
 
 CREATE OR ALTER PROCEDURE silver.load_silver AS 
