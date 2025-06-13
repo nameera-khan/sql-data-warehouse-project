@@ -1,10 +1,10 @@
+--EXEC silver.load_silver
 /*
 Script Purpose: LOAD SILVER LAYER WITH TRANSFORMATIONS INTO THE DATABASE
 Notes: Run this file after loading the bronze layer.
 - In MacOS using azure data studio, you must download an extension and upload the dataset into the server manually. 
 */
 
---EXEC silver.load_silver
 
 CREATE OR ALTER PROCEDURE silver.load_silver AS 
 BEGIN
@@ -58,7 +58,19 @@ DROP TABLE silver.temp_transformed_cust;
 
 COMMIT TRANSACTION;
 -- insert the above into silver table 
-
+IF OBJECT_ID('silver.crm_prod_info','U') IS NOT NULL
+    DROP TABLE silver.crm_prod_info
+CREATE TABLE [silver].[crm_prod_info] (
+    [prd_id]          SMALLINT      NULL,
+    [cat_id]          NVARCHAR (50) NULL,
+    [prd_key]         NVARCHAR (50) NULL,
+    [prd_nm]          NVARCHAR (50) NULL,
+    [prd_cost]        SMALLINT      NULL,
+    [prd_line]        NVARCHAR (50) NULL,
+    [prd_start_dt]    DATE          NULL,
+    [prd_end_dt]      DATE          NULL,
+    [dwh_create_date] DATETIME2 (7) CONSTRAINT [DF_crm_prod_info_dwh_create_date] DEFAULT (CONVERT([datetime2],getdate())) NOT NULL
+);
 BEGIN TRANSACTION;
 
 -- Step 1: Create transformed data in temp table
