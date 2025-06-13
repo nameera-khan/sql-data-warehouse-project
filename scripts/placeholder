@@ -3,3 +3,10 @@ Adding datasets (csv or flat files) in SQL server on macOS requires extentions. 
 This requires downloading docker and connecting the server to the docker container. 
 
 Stored procedure in this setting can only be done after the CSV file has been imported into the SQL server. 
+
+STEP 1: Create the required schema 
+STEP 2: Upload all datasets using 'import wizard' by right clicking on the database into the bronze schema
+STEP 3: Copy the datasets into Silver schema using the code in 'copy_into_silver_2'
+STEP 4: Transform the data in silver schema 
+STEP 5: Create stored procedure for future usage using EXEC 
+
