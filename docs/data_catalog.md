@@ -37,5 +37,17 @@ The Gold Layer exhibits the business level view of the data after preprocessing.
 |product_line| NVARCHAR |The specific product line or series to which the product belongs |
 |start_date | DATE | The date when the product was made available to use |
 
+## 3. gold.fact_sales 
+• Purpose: Stores transactional sales data for analytical purposes
+
+|Column_name | Data Type | Description |
+|:----------|:----------:|------------:|
+|order_number | NVARCHAR | Unique alphanumeric identifier for sales order |
+|product_key | INT | Surrogate key linking the order to product dimension table|
+|customer_key|INT| Surrogate key linking the order to customer dimension table|
+|order_date|DATE| When the order was made|
+|shipping_date|DATE| When the order was shipped|
+|due_date|DATE|When the order IS EXPECTED TO BE DELIVERED.|
+|sales_amount|
 
 
