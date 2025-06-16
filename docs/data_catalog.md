@@ -48,6 +48,9 @@ The Gold Layer exhibits the business level view of the data after preprocessing.
 |order_date|DATE| When the order was made|
 |shipping_date|DATE| When the order was shipped|
 |due_date|DATE|When the order IS EXPECTED TO BE DELIVERED.|
-|sales_amount|
+|sales_amount| INT | total monetary value of the product line item in whole currency units|
+|quantity | INT | Number of units of the product sold |
+|price| INT | price per unit of the product for the line item |
+
 
 
