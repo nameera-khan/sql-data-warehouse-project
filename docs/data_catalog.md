@@ -14,3 +14,6 @@ The Gold Layer exhibits the business level view of the data after preprocessing.
 |customer_id        | INT       | Unique numerical identifier assigned to each customer| 
 | first_name        | NVARCHAR  | Alphanumeric identifier representing the customer, used for tracking and referencing |
 |last_name          | NVARCHAR  | The customer's last name as recorded         |
+|country            | NVARCHAR  | The country of residence of the customer |
+|marital_status     | NVARCHAR | The marital status of the customer  |
+
