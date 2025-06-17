@@ -1,4 +1,6 @@
-![DWH](https://github.com/user-attachments/assets/05ec727a-e3ec-4b09-ac06-78cc53ecf7b1)# sql-data-warehouse-project
+
+# sql-data-warehouse-project
+![DWH](https://github.com/user-attachments/assets/05ec727a-e3ec-4b09-ac06-78cc53ecf7b1)
 A modern data warehouse with SQL server which includes ETL processes, data modelling and analytics
 
 This is a repository for the **Data Warehouse and Analytics Project** !
