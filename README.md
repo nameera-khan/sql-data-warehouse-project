@@ -14,7 +14,7 @@ To develop a data warehouse using SQL server to combine sales data, consequently
 - **Data Quality** : Cleanse and transform the data suitable for business analysis
 - **Integration** : Combine the 2 source files into a single, user-friendly data model designed for analytical queries. 
 - **Scope** : Focus on the latest dataset only and not include historisation in the warehouse.
-- **Documentation** : Provide clear documentation of the data model to support business stakeholders and technical teams. 
+- **Documentation** : Provide clear documentation of the data model to support business stakeholders and technical teams.
 
 
 ---
@@ -25,6 +25,10 @@ Develop SQL based analytics to create ad-hoc reports for the following:
 - Sales Trends
 
 These insights are helpful in empowering stakeholders with key business metrics. 
+---
+### Star Schema 
+![Sales schema](https://github.com/user-attachments/assets/27ed84aa-e3ff-48d8-b6be-c77460da43e4)
+
 
 ## License 
 This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and share this project with proper attribution. 
