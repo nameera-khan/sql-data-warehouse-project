@@ -35,24 +35,21 @@ These insights are helpful in empowering stakeholders with key business metrics.
 
 ## Repository structure 
 <details>
-'''plaintext
+
+```plaintext
 data-warehouse-project/
-│
-├── datasets/                           # Raw CRM and ERP datasets
-│
-├── docs/                               # Project documentation and architecture details
-│   ├── IntegrationModel.svg                      # Draw.io that shows the integration model between CRM and ERP table and data flow diagram
-│   ├── data_catalog.md                 # Catalog of datasets and gold layer variables to view for business insights
-│
-├── scripts/                            # SQL scripts for ETL and transformations
-│   ├── bronze/                         # Scripts for extracting and loading raw data with steps for data upload using Azure Data studio SQL extension
-│   ├── silver/                         # Scripts for cleaning and transforming data
-│   ├── gold/                           # Scripts for creating analytical models
-│
-├── tests/                              # Test scripts and quality files            
-├── README.md                           # Project overview and instructions
-├── LICENSE                             # License information for the repository
-├── .gitignore                          # Files and directories to be ignored by Git
+├── datasets/                # Raw CRM and ERP datasets
+├── docs/                    # Project documentation
+│   ├── IntegrationModel.svg # Draw.io diagram
+│   └── data_catalog.md      # Dataset catalog
+├── scripts/                 # SQL ETL scripts
+│   ├── bronze/              # Raw data extraction
+│   ├── silver/              # Data cleaning
+│   └── gold/                # Analytical models
+├── tests/                   # Test scripts
+├── README.md                # Project overview
+├── LICENSE                  # MIT License
+└── .gitignore              # Git ignore rules
 '''
 </details> 
 ## License 
