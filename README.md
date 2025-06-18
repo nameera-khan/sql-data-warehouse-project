@@ -33,7 +33,26 @@ These insights are helpful in empowering stakeholders with key business metrics.
 ### Star Schema 
 ![Sales schema](https://github.com/user-attachments/assets/27ed84aa-e3ff-48d8-b6be-c77460da43e4)
 
-
+## Repository structure 
+data-warehouse-project/
+│
+├── datasets/                           # Raw CRM and ERP datasets
+│
+├── docs/                               # Project documentation and architecture details
+│   ├── IntegrationModel.svg                      # Draw.io that shows the integration model between CRM and ERP table and data flow diagram
+│   ├── data_catalog.md                 # Catalog of datasets and gold layer variables to view for business insights
+│
+├── scripts/                            # SQL scripts for ETL and transformations
+│   ├── bronze/                         # Scripts for extracting and loading raw data with steps for data upload using Azure Data studio SQL extension
+│   ├── silver/                         # Scripts for cleaning and transforming data
+│   ├── gold/                           # Scripts for creating analytical models
+│
+├── tests/                              # Test scripts and quality files
+│   |-- Quality_checks/              
+├── README.md                           # Project overview and instructions
+├── LICENSE                             # License information for the repository
+├── .gitignore                          # Files and directories to be ignored by Git
+            
 ## License 
 This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and share this project with proper attribution. 
 
