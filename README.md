@@ -34,7 +34,6 @@ These insights are helpful in empowering stakeholders with key business metrics.
 ![Sales schema](https://github.com/user-attachments/assets/27ed84aa-e3ff-48d8-b6be-c77460da43e4)
 
 ## Repository structure 
-<details>
 
 ```plaintext
 data-warehouse-project/
@@ -50,8 +49,8 @@ data-warehouse-project/
 ├── README.md                # Project overview
 ├── LICENSE                  # MIT License
 └── .gitignore              # Git ignore rules
-'''
-</details> 
+
+
 ## License 
 This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and share this project with proper attribution. 
 
